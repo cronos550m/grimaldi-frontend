@@ -1,0 +1,233 @@
+
+
+/* Layout general de la landing */
+
+.page-landing {
+  background: #f7f8fb;
+  color: #222;
+}
+
+/* Secciones tipo Worky */
+.section-landing {
+  padding: 80px 16px;
+}
+
+.section-landing:nth-of-type(odd) {
+  background: #ffffff;
+}
+
+.section-landing:nth-of-type(even) {
+  background: #f3f5fa;
+}
+
+.section-landing .section-inner {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+/* Títulos de sección */
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.section-subtitle {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 32px auto;
+  font-size: 14px;
+  opacity: 0.75;
+}
+
+/* HERO: fondo + layout */
+
+#hero.section-landing {
+  position: relative;
+  /* acá va tu imagen de fondo en /public */
+  background-image: url("/grimaldi_left_bigger2_1920x1080_64c.jpg"); /* ajustá la extensión si no es .jpg */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: #fff;
+}
+
+/* Overlay para oscurecer un poco el fondo y que se lea el texto */
+#hero.section-landing::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at left,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0.8)
+  );
+}
+
+#hero .section-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-landing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 32px;
+  min-height: 70vh;
+}
+
+.hero-main {
+  flex: 1 1 320px;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(232, 243, 255, 0.9);
+  color: #004aad;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 12px;
+}
+
+.hero-title {
+  font-size: 32px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.hero-text {
+  font-size: 14px;
+  opacity: 0.9;
+  max-width: 480px;
+}
+
+.hero-actions {
+  margin-top: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.btn-primary {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #10a1c8, #004aad);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-outline {
+  padding: 10px 18px;
+  border-radius: 999px;
+  border: 1px solid #ccd3e5;
+  background: #fff;
+  color: #004aad;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.hero-side {
+  flex: 1 1 320px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Tarjeta del hero (a la derecha) */
+.hero-card {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  padding: 20px;
+  display: grid;
+  gap: 10px;
+  color: #222;
+}
+
+/* Si en algún momento volvemos a usar imagen dentro del hero-side */
+.hero-image-wrapper {
+  width: 100%;
+  max-width: 520px;
+}
+
+.hero-image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 16px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Grid de tarjetas (servicios, flota, etc.) */
+
+.grid-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px;
+}
+
+.card-landing {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card-landing img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 8px;
+}
+
+.card-title {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.card-text {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+/* Testimonios / citas */
+
+.testimonial-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  font-size: 13px;
+}
+
+/* Contacto */
+
+.contact-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+  gap: 28px;
+}
+
+@media (max-width: 800px) {
+  .hero-landing {
+    min-height: auto;
+  }
+  .contact-layout {
+    grid-template-columns: 1fr;
+  }
+}
