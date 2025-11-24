@@ -731,44 +731,42 @@ export default function Home() {
       </section>
 
       {/* NOSOTROS */}
-      <section id="nosotros" className="section-landing">
-        <div
-          className="section-inner"
-          style={{
-            display: "flex",
-            gap: 32,
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 260 }}>
-            <h2 className="section-title" data-animate="left">
-              {aboutTitle}
-            </h2>
-            <p className="section-subtitle" data-animate="right">
-              {aboutDesc}
-            </p>
-          </div>
+      {/* NOSOTROS */}
+<section id="nosotros" className="section-landing">
+  <div
+    className="section-inner"
+    style={{
+      display: "flex",
+      gap: 32,
+      alignItems: "center",
+      flexWrap: "wrap",
+    }}
+  >
+    <div style={{ flex: 1, minWidth: 260 }}>
+      <h2 className="section-title" data-animate="left">
+        {aboutTitle}
+      </h2>
+      <p className="section-subtitle" data-animate="right">
+        {aboutDesc}
+      </p>
+    </div>
 
-          {texts.about?.image && (
-          <div style={{ flex: 1, minWidth: 260 }}>
-          <img
-            src={aboutImage}
-            alt={lang === "es" ? "Equipo de logística" : "Logistics team"}
-            style={{
-              width: "100%",
-              display: "block",
-              borderRadius: 24,
-              objectFit: "cover",
-              boxShadow: "0 18px 50px rgba(15,23,42,0.18)",
-            }}
-          />
-        </div>
+    <div style={{ flex: 1, minWidth: 260 }}>
+      <img
+        src={aboutImage}
+        alt={lang === "es" ? "Equipo de logística" : "Logistics team"}
+        style={{
+          width: "100%",
+          display: "block",
+          borderRadius: 24,
+          objectFit: "cover",
+          boxShadow: "0 18px 50px rgba(15,23,42,0.18)",
+        }}
+      />
+    </div>
+  </div>
+</section>
 
-
-          )}
-        </div>
-      </section>
 
       {/* TESTIMONIOS */}
       <section id="testimonios" className="section-landing">
