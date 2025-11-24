@@ -63,8 +63,12 @@
   display: block;
   height: 2px;
   border-radius: 999px;
-  background: #e5e7eb;
+  background: #22d3ee; /* aqua parecido al logo */
 }
+.navbar-toggle:hover span {
+  background: #a5f3fc; /* aqua más clarito al hover */
+}
+
 
 /* Menú en desktop */
 .navbar-menu {
