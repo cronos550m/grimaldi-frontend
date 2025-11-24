@@ -52,9 +52,12 @@ export default function Home() {
       ? "Conectamos tu carga con cualquier punto del país y del mundo"
       : "We connect your cargo with any point in the country and the world");
 
-  const heroDesc = texts.home?.desc || "";
-  const heroImage = texts.home?.heroImage;
+      const heroDesc = texts.home?.desc || "";
 
+      // imagen por defecto del hero (está en public/)
+      const HERO_FALLBACK = "/grimaldi_left_bigger2_1920x1080_64c.png";
+      const heroImage = texts.home?.heroImage || HERO_FALLBACK;
+    
   // SERVICIOS
   const servicesTitle =
     texts.services_title?.[lang] ||
@@ -79,6 +82,9 @@ export default function Home() {
     (lang === "es"
       ? "Somos una empresa de transporte y logística que brinda soluciones nacionales e internacionales para distintos sectores. Integramos transporte terrestre, marítimo y aéreo con almacenaje, distribución y gestión aduanera."
       : "We are a transport and logistics company providing national and international solutions for different sectors, integrating road, sea and air transport with warehousing, distribution and customs management.");
+
+      const ABOUT_FALLBACK_IMAGE = "/nosotros/nosotros_familia2_1920x1080.jpg";
+      const aboutImage = texts.about?.image || ABOUT_FALLBACK_IMAGE;
 
   // TESTIMONIOS
   const testimonialsTitle =
@@ -168,7 +174,9 @@ export default function Home() {
       ? "Mariano Castex 1140, Piso 4 Oficina 412, Canning, Buenos Aires"
       : "Mariano Castex 1140, 4th floor, office 412, Canning, Buenos Aires");
 
-  const contactQrImage = contactConfig?.qrImage || "";
+      const DEFAULT_QR_IMAGE = "/QRSer.png";
+      const contactQrImage = contactConfig?.qrImage || DEFAULT_QR_IMAGE;
+    
 
   // CARRUSEL DE SERVICIOS
   const fallbackImages = [
@@ -743,19 +751,21 @@ export default function Home() {
           </div>
 
           {texts.about?.image && (
-            <div style={{ flex: 1, minWidth: 260 }}>
-              <img
-                src={texts.about.image}
-                alt={lang === "es" ? "Equipo de logística" : "Logistics team"}
-                style={{
-                  width: "100%",
-                  display: "block",
-                  borderRadius: 24,
-                  objectFit: "cover",
-                  boxShadow: "0 18px 50px rgba(15,23,42,0.18)",
-                }}
-              />
-            </div>
+          <div style={{ flex: 1, minWidth: 260 }}>
+          <img
+            src={aboutImage}
+            alt={lang === "es" ? "Equipo de logística" : "Logistics team"}
+            style={{
+              width: "100%",
+              display: "block",
+              borderRadius: 24,
+              objectFit: "cover",
+              boxShadow: "0 18px 50px rgba(15,23,42,0.18)",
+            }}
+          />
+        </div>
+
+
           )}
         </div>
       </section>
