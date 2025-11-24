@@ -91,14 +91,15 @@ export default function AboutAdmin({ token }) {
     }
   };
 
-  const uploadImage = async (file, field = "home_hero_image") => {
+  // CORREGIDO: usa uploadAboutLoading y escribe sobre about_image
+  const uploadImage = async (file, field = "about_image") => {
     if (!file) return;
-  
+
     const fd = new FormData();
     fd.append("file", file);
-  
-    setUploadHeroLoading(true);
-  
+
+    setUploadAboutLoading(true);
+
     try {
       const res = await api.post("/uploads", fd, {
         headers: {
@@ -106,22 +107,22 @@ export default function AboutAdmin({ token }) {
           "Content-Type": "multipart/form-data",
         },
       });
-  
-      const url = res.data?.url || "";
+
+      const data = res.data || {};
+      const url = data.url || data.path || "";
       if (!url) {
         alert("No se recibió la URL del archivo");
         return;
       }
-  
+
       setLocal((prev) => ({ ...prev, [field]: url }));
     } catch (e) {
       console.error("Error subiendo imagen", e);
       alert("Error subiendo imagen");
     } finally {
-      setUploadHeroLoading(false);
+      setUploadAboutLoading(false);
     }
   };
-  
 
   if (loading) {
     return <div>Cargando sección "Nosotros"...</div>;
@@ -214,7 +215,7 @@ export default function AboutAdmin({ token }) {
         <input
           type="file"
           accept="image/*"
-          onChange={(e) => uploadImage(e.target.files?.[0])}
+          onChange={(e) => uploadImage(e.target.files?.[0], "about_image")}
         />
         {uploadAboutLoading && <span>Subiendo...</span>}
       </div>

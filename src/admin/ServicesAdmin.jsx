@@ -10,13 +10,13 @@ export default function ServicesAdmin({ token }) {
     title: { es: "", en: "" },
     description: { es: "", en: "" },
     image: "",
-    image_mobile: "", // NUEVO
+    image_mobile: "",
     order: 0,
     active: true,
   });
 
   const fileInputRef = useRef(null);
-  const fileInputMobileRef = useRef(null); // NUEVO
+  const fileInputMobileRef = useRef(null);
 
   // Mensajes lindos (éxito / error)
   const [status, setStatus] = useState(null);
@@ -47,7 +47,7 @@ export default function ServicesAdmin({ token }) {
       title: { es: "", en: "" },
       description: { es: "", en: "" },
       image: "",
-      image_mobile: "", // NUEVO
+      image_mobile: "",
       order: 0,
       active: true,
     });
@@ -55,6 +55,19 @@ export default function ServicesAdmin({ token }) {
   };
 
   const startEdit = (it) => {
+    // fuente de imagen principal y mobile desde lo que venga del backend
+    const baseImage =
+      it.image ||
+      it.image_url ||
+      it.url ||
+      it.path ||
+      (it.media && it.media.image);
+
+    const baseImageMobile =
+      it.image_mobile ||
+      it.imageMobile ||
+      baseImage;
+
     setEditing(it);
     setForm({
       title: {
@@ -65,8 +78,8 @@ export default function ServicesAdmin({ token }) {
         es: it.desc_es || (it.description && it.description.es) || "",
         en: it.desc_en || (it.description && it.description.en) || "",
       },
-      image: it.image || "",
-      image_mobile: it.image_mobile || it.image || "", // NUEVO
+      image: baseImage || "",
+      image_mobile: baseImageMobile || "",
       order: it.order || 0,
       active: it.active ?? true,
     });
@@ -78,17 +91,21 @@ export default function ServicesAdmin({ token }) {
       title: form.title,
       description: form.description,
       image: form.image,
-      image_mobile: form.image_mobile, // NUEVO
+      image_mobile: form.image_mobile,
       order: Number(form.order) || 0,
       active: !!form.active,
     };
 
     try {
-      if (editing && editing.id) {
-        await api.put("/services/" + editing.id, payload, authConfig(token));
+      const cfg = authConfig(token);
+      const id = editing && (editing.id || editing._id);
+
+      if (id) {
+        await api.put("/services/" + id, payload, cfg);
       } else {
-        await api.post("/services", payload, authConfig(token));
+        await api.post("/services", payload, cfg);
       }
+
       resetFileInputs();
       startNew();
       load();
@@ -102,7 +119,9 @@ export default function ServicesAdmin({ token }) {
   const del = async (it) => {
     if (!window.confirm("¿Eliminar este servicio?")) return;
     try {
-      await api.delete("/services/" + it.id, authConfig(token));
+      const cfg = authConfig(token);
+      const id = it.id || it._id;
+      await api.delete("/services/" + id, cfg);
       load();
       showStatus("success", "Servicio eliminado correctamente");
     } catch (e) {
@@ -111,6 +130,7 @@ export default function ServicesAdmin({ token }) {
     }
   };
 
+  // subir imagen (desktop o mobile) al mismo endpoint
   const uploadImage = async (file) => {
     const fd = new FormData();
     fd.append("file", file);
@@ -120,7 +140,14 @@ export default function ServicesAdmin({ token }) {
         "Content-Type": "multipart/form-data",
       },
     });
-    return res.data.url;
+
+    const data = res.data || {};
+    // intenta tomar url o path, lo que venga
+    const url = data.url || data.path || data.Location || data.location || "";
+    if (!url) {
+      throw new Error("No se recibió URL de la imagen");
+    }
+    return url;
   };
 
   const onFileChange = async (e) => {
@@ -136,7 +163,7 @@ export default function ServicesAdmin({ token }) {
     }
   };
 
-  // NUEVO: subida de imagen mobile
+  // subida de imagen mobile
   const onFileChangeMobile = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -196,56 +223,78 @@ export default function ServicesAdmin({ token }) {
             Nuevo
           </button>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {items.map((it) => (
-              <div
-                key={it.id}
-                className="card"
-                style={{
-                  padding: 8,
-                  display: "flex",
-                  gap: 8,
-                  alignItems: "flex-start",
-                }}
-              >
-                {it.image && (
-                  <img
-                    src={it.image}
-                    alt={it.title_es || ""}
+            {items.map((it) => {
+              const thumb =
+                it.image ||
+                it.image_mobile ||
+                it.image_url ||
+                it.url ||
+                it.path ||
+                (it.media && it.media.image);
+
+              return (
+                <div
+                  key={it.id || it._id}
+                  className="card"
+                  style={{
+                    padding: 8,
+                    display: "flex",
+                    gap: 8,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  {thumb && (
+                    <img
+                      src={thumb}
+                      alt={it.title_es || (it.title && it.title.es) || ""}
+                      style={{
+                        width: 48,
+                        height: 48,
+                        objectFit: "cover",
+                        borderRadius: 4,
+                        flexShrink: 0,
+                      }}
+                    />
+                  )}
+                  <div style={{ flex: 1, fontSize: 13 }}>
+                    <strong>
+                      {it.title_es || (it.title && it.title.es) || "Sin título"}
+                    </strong>
+                    <div
+                      style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}
+                    >
+                      Orden: {it.order} · {it.active ? "Activo" : "Inactivo"}
+                    </div>
+                    <div>
+                      <div>
+                        <span style={{ fontWeight: 600 }}>ES: </span>
+                        {resumen(
+                          it.desc_es ||
+                            (it.description && it.description.es)
+                        )}
+                      </div>
+                      <div>
+                        <span style={{ fontWeight: 600 }}>EN: </span>
+                        {resumen(
+                          it.desc_en ||
+                            (it.description && it.description.en)
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div
                     style={{
-                      width: 48,
-                      height: 48,
-                      objectFit: "cover",
-                      borderRadius: 4,
-                      flexShrink: 0,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 4,
                     }}
-                  />
-                )}
-                <div style={{ flex: 1, fontSize: 13 }}>
-                  <strong>{it.title_es}</strong>
-                  <div style={{ fontSize: 12, opacity: 0.7, marginBottom: 4 }}>
-                    Orden: {it.order} · {it.active ? "Activo" : "Inactivo"}
-                  </div>
-                  <div>
-                    <div>
-                      <span style={{ fontWeight: 600 }}>ES: </span>
-                      {resumen(
-                        it.desc_es || (it.description && it.description.es)
-                      )}
-                    </div>
-                    <div>
-                      <span style={{ fontWeight: 600 }}>EN: </span>
-                      {resumen(
-                        it.desc_en || (it.description && it.description.en)
-                      )}
-                    </div>
+                  >
+                    <button onClick={() => startEdit(it)}>Editar</button>
+                    <button onClick={() => del(it)}>Borrar</button>
                   </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  <button onClick={() => startEdit(it)}>Editar</button>
-                  <button onClick={() => del(it)}>Borrar</button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -337,11 +386,7 @@ export default function ServicesAdmin({ token }) {
                 }
                 style={{ width: "100%", padding: 6 }}
               />
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={onFileChange}
-              />
+              <input type="file" ref={fileInputRef} onChange={onFileChange} />
               {form.image && (
                 <div style={{ marginTop: 4 }}>
                   <div style={{ fontSize: 12, marginBottom: 4 }}>
@@ -391,7 +436,7 @@ export default function ServicesAdmin({ token }) {
                     alt="preview mobile"
                     style={{
                       width: 100,
-                      height: 160, // más vertical
+                      height: 160,
                       objectFit: "cover",
                       borderRadius: 6,
                     }}
