@@ -10,10 +10,13 @@ export default function ServicesAdmin({ token }) {
     title: { es: "", en: "" },
     description: { es: "", en: "" },
     image: "",
+    image_mobile: "", // NUEVO
     order: 0,
     active: true,
   });
+
   const fileInputRef = useRef(null);
+  const fileInputMobileRef = useRef(null); // NUEVO
 
   // Mensajes lindos (éxito / error)
   const [status, setStatus] = useState(null);
@@ -33,18 +36,22 @@ export default function ServicesAdmin({ token }) {
     load();
   }, []);
 
+  const resetFileInputs = () => {
+    if (fileInputRef.current) fileInputRef.current.value = "";
+    if (fileInputMobileRef.current) fileInputMobileRef.current.value = "";
+  };
+
   const startNew = () => {
     setEditing(null);
     setForm({
       title: { es: "", en: "" },
       description: { es: "", en: "" },
       image: "",
+      image_mobile: "", // NUEVO
       order: 0,
       active: true,
     });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    resetFileInputs();
   };
 
   const startEdit = (it) => {
@@ -59,12 +66,11 @@ export default function ServicesAdmin({ token }) {
         en: it.desc_en || (it.description && it.description.en) || "",
       },
       image: it.image || "",
+      image_mobile: it.image_mobile || it.image || "", // NUEVO
       order: it.order || 0,
       active: it.active ?? true,
     });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    resetFileInputs();
   };
 
   const save = async () => {
@@ -72,6 +78,7 @@ export default function ServicesAdmin({ token }) {
       title: form.title,
       description: form.description,
       image: form.image,
+      image_mobile: form.image_mobile, // NUEVO
       order: Number(form.order) || 0,
       active: !!form.active,
     };
@@ -82,9 +89,7 @@ export default function ServicesAdmin({ token }) {
       } else {
         await api.post("/services", payload, authConfig(token));
       }
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      resetFileInputs();
       startNew();
       load();
       showStatus("success", "Servicio guardado correctamente");
@@ -128,6 +133,20 @@ export default function ServicesAdmin({ token }) {
     } catch (err) {
       console.error(err);
       showStatus("error", "No se pudo subir la imagen");
+    }
+  };
+
+  // NUEVO: subida de imagen mobile
+  const onFileChangeMobile = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    try {
+      const url = await uploadImage(file);
+      setForm((prev) => ({ ...prev, image_mobile: url }));
+      showStatus("success", "Imagen mobile subida correctamente");
+    } catch (err) {
+      console.error(err);
+      showStatus("error", "No se pudo subir la imagen mobile");
     }
   };
 
@@ -209,11 +228,15 @@ export default function ServicesAdmin({ token }) {
                   <div>
                     <div>
                       <span style={{ fontWeight: 600 }}>ES: </span>
-                      {resumen(it.desc_es || (it.description && it.description.es))}
+                      {resumen(
+                        it.desc_es || (it.description && it.description.es)
+                      )}
                     </div>
                     <div>
                       <span style={{ fontWeight: 600 }}>EN: </span>
-                      {resumen(it.desc_en || (it.description && it.description.en))}
+                      {resumen(
+                        it.desc_en || (it.description && it.description.en)
+                      )}
                     </div>
                   </div>
                 </div>
@@ -274,7 +297,10 @@ export default function ServicesAdmin({ token }) {
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
-                    description: { ...prev.description, es: e.target.value },
+                    description: {
+                      ...prev.description,
+                      es: e.target.value,
+                    },
                   }))
                 }
                 style={{ width: "100%" }}
@@ -289,36 +315,83 @@ export default function ServicesAdmin({ token }) {
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
-                    description: { ...prev.description, en: e.target.value },
+                    description: {
+                      ...prev.description,
+                      en: e.target.value,
+                    },
                   }))
                 }
                 style={{ width: "100%" }}
               />
             </label>
 
-            <label>Imagen</label>
+            {/* Imagen desktop */}
+            <label>Imagen (desktop)</label>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
               <input
                 type="text"
-                placeholder="URL de la imagen"
+                placeholder="URL de la imagen desktop"
                 value={form.image || ""}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, image: e.target.value }))
                 }
                 style={{ width: "100%", padding: 6 }}
               />
-              <input type="file" ref={fileInputRef} onChange={onFileChange} />
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={onFileChange}
+              />
               {form.image && (
                 <div style={{ marginTop: 4 }}>
                   <div style={{ fontSize: 12, marginBottom: 4 }}>
-                    Vista previa:
+                    Vista previa desktop:
                   </div>
                   <img
                     src={form.image}
-                    alt="preview"
+                    alt="preview desktop"
                     style={{
                       width: 140,
                       height: 100,
+                      objectFit: "cover",
+                      borderRadius: 6,
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Imagen mobile */}
+            <label style={{ marginTop: 8 }}>Imagen (mobile)</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <input
+                type="text"
+                placeholder="URL de la imagen mobile (vertical)"
+                value={form.image_mobile || ""}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    image_mobile: e.target.value,
+                  }))
+                }
+                style={{ width: "100%", padding: 6 }}
+              />
+              <input
+                type="file"
+                ref={fileInputMobileRef}
+                onChange={onFileChangeMobile}
+              />
+              {form.image_mobile && (
+                <div style={{ marginTop: 4 }}>
+                  <div style={{ fontSize: 12, marginBottom: 4 }}>
+                    Vista previa mobile:
+                  </div>
+                  <img
+                    src={form.image_mobile}
+                    alt="preview mobile"
+                    style={{
+                      width: 100,
+                      height: 160, // más vertical
                       objectFit: "cover",
                       borderRadius: 6,
                     }}
