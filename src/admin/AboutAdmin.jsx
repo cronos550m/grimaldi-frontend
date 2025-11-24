@@ -91,15 +91,14 @@ export default function AboutAdmin({ token }) {
     }
   };
 
-  const uploadImage = async (file) => {
+  const uploadImage = async (file, field = "home_hero_image") => {
     if (!file) return;
-
+  
     const fd = new FormData();
     fd.append("file", file);
-
-    setUploadAboutLoading(true);
-    setStatus(null);
-
+  
+    setUploadHeroLoading(true);
+  
     try {
       const res = await api.post("/uploads", fd, {
         headers: {
@@ -107,31 +106,22 @@ export default function AboutAdmin({ token }) {
           "Content-Type": "multipart/form-data",
         },
       });
-
+  
       const url = res.data?.url || "";
       if (!url) {
-        setStatus({
-          type: "error",
-          message: "No se recibió la URL del archivo subido.",
-        });
+        alert("No se recibió la URL del archivo");
         return;
       }
-
-      setLocal((prev) => ({ ...prev, about_image: url }));
-      setStatus({
-        type: "success",
-        message: "Imagen subida correctamente.",
-      });
+  
+      setLocal((prev) => ({ ...prev, [field]: url }));
     } catch (e) {
       console.error("Error subiendo imagen", e);
-      setStatus({
-        type: "error",
-        message: "Error subiendo la imagen. Probá de nuevo.",
-      });
+      alert("Error subiendo imagen");
     } finally {
-      setUploadAboutLoading(false);
+      setUploadHeroLoading(false);
     }
   };
+  
 
   if (loading) {
     return <div>Cargando sección "Nosotros"...</div>;

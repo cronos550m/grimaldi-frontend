@@ -17,6 +17,7 @@ export function LanguageProvider({ children }) {
         const res = await api.get("/settings");
         const data = res.data || {};
 
+        // Agrupar claves terminadas en _es / _en
         const grouped = {};
         Object.keys(data).forEach((key) => {
           if (key.endsWith("_es")) {
@@ -40,6 +41,9 @@ export function LanguageProvider({ children }) {
               ? data.home_desc_es || grouped.home_desc?.es
               : data.home_desc_en || grouped.home_desc?.en,
           heroImage: data.home_hero_image || "",
+          // NUEVO: imagen específica para mobile, cae a la de desktop si no hay
+          heroImageMobile:
+            data.home_hero_image_mobile || data.home_hero_image || "",
         };
 
         const about = {

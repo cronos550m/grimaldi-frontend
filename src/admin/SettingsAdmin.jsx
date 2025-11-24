@@ -5,6 +5,7 @@ export default function SettingsAdmin({ token }) {
   const [loading, setLoading] = useState(true);
   const [local, setLocal] = useState({
     home_hero_image: "",
+    home_hero_image_mobile: "", // mobile
     navbar_theme: "blue",
     show_hero_tag: false,
   });
@@ -22,6 +23,7 @@ export default function SettingsAdmin({ token }) {
         const data = res.data || {};
         setLocal({
           home_hero_image: data.home_hero_image || "",
+          home_hero_image_mobile: data.home_hero_image_mobile || "",
           navbar_theme: data.navbar_theme || "blue",
           show_hero_tag:
             data.show_hero_tag === true || data.show_hero_tag === "true",
@@ -46,6 +48,13 @@ export default function SettingsAdmin({ token }) {
         cfg
       );
 
+      // guardar imagen hero mobile
+      await api.post(
+        "/settings/home_hero_image_mobile",
+        { value: local.home_hero_image_mobile },
+        cfg
+      );
+
       await api.post(
         "/settings/navbar_theme",
         { value: local.navbar_theme },
@@ -67,7 +76,7 @@ export default function SettingsAdmin({ token }) {
     }
   };
 
-  const uploadImage = async (file) => {
+  const uploadImage = async (file, field = "home_hero_image") => {
     if (!file) return;
 
     const fd = new FormData();
@@ -89,7 +98,7 @@ export default function SettingsAdmin({ token }) {
         return;
       }
 
-      setLocal((prev) => ({ ...prev, home_hero_image: url }));
+      setLocal((prev) => ({ ...prev, [field]: url }));
     } catch (e) {
       console.error("Error subiendo imagen", e);
       alert("Error subiendo imagen");
@@ -139,40 +148,119 @@ export default function SettingsAdmin({ token }) {
 
       <h3 style={{ marginTop: 30 }}>Imagen del Hero</h3>
       <p style={{ fontSize: 12, opacity: 0.7 }}>
-        Subí la imagen desde acá; la URL se guarda sola en el setting.
+        Configurá las imágenes del hero para versión desktop y versión mobile.
+        Las URLs se completan automáticamente al subir los archivos, pero podés
+        pegarlas a mano si ya las tenés.
       </p>
-      <div
-        style={{
-          display: "flex",
-          gap: 8,
-          alignItems: "center",
-          marginBottom: 8,
-        }}
-      >
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => uploadImage(e.target.files?.[0])}
-        />
-        {uploadHeroLoading && <span>Subiendo...</span>}
-      </div>
-      <input
-        style={{ width: "100%", padding: 8, marginBottom: 8 }}
-        placeholder="URL de la imagen del hero"
-        value={local.home_hero_image}
-        onChange={(e) =>
-          setLocal({ ...local, home_hero_image: e.target.value })
-        }
-      />
-      {local.home_hero_image && (
-        <div style={{ marginBottom: 16 }}>
-          <img
-            src={local.home_hero_image}
-            alt="Hero preview"
-            style={{ maxWidth: "100%", borderRadius: 12 }}
+
+      <div style={{ display: "grid", gap: 16 }}>
+        {/* Hero desktop */}
+        <div style={{ marginBottom: 8 }}>
+          <h4 style={{ marginBottom: 4 }}>Versión desktop</h4>
+          <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 8 }}>
+            Idealmente una imagen horizontal (por ejemplo 1920×1080).
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                uploadImage(e.target.files?.[0], "home_hero_image")
+              }
+            />
+            {uploadHeroLoading && <span>Subiendo...</span>}
+          </div>
+
+          <input
+            style={{ width: "100%", padding: 8, marginBottom: 8 }}
+            placeholder="URL de la imagen del hero (desktop)"
+            value={local.home_hero_image}
+            onChange={(e) =>
+              setLocal({ ...local, home_hero_image: e.target.value })
+            }
           />
+
+          {local.home_hero_image && (
+            <div style={{ marginBottom: 16 }}>
+              <img
+                src={local.home_hero_image}
+                alt="Hero desktop preview"
+                style={{
+                  maxWidth: "100%",
+                  borderRadius: 12,
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Hero mobile */}
+        <div style={{ marginBottom: 8 }}>
+          <h4 style={{ marginBottom: 4 }}>Versión mobile</h4>
+          <p style={{ fontSize: 12, opacity: 0.7, marginBottom: 8 }}>
+            Esta imagen se usará en la versión mobile (pantallas chicas). Lo
+            ideal es una imagen vertical (por ejemplo 1080×1920). Si la dejás
+            vacía, se usará la imagen de desktop.
+          </p>
+
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              alignItems: "center",
+              marginBottom: 8,
+            }}
+          >
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) =>
+                uploadImage(
+                  e.target.files?.[0],
+                  "home_hero_image_mobile"
+                )
+              }
+            />
+            {uploadHeroLoading && <span>Subiendo...</span>}
+          </div>
+
+          <input
+            style={{ width: "100%", padding: 8, marginBottom: 8 }}
+            placeholder="URL de la imagen del hero (mobile)"
+            value={local.home_hero_image_mobile}
+            onChange={(e) =>
+              setLocal({
+                ...local,
+                home_hero_image_mobile: e.target.value,
+              })
+            }
+          />
+
+          {local.home_hero_image_mobile && (
+            <div style={{ marginBottom: 16 }}>
+              <img
+                src={local.home_hero_image_mobile}
+                alt="Hero mobile preview"
+                style={{
+                  width: 160,
+                  height: 260,
+                  borderRadius: 12,
+                  objectFit: "cover",
+                }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
 
       <h3 style={{ marginTop: 30 }}>Color del Navbar</h3>
       <p style={{ fontSize: 12, opacity: 0.7 }}>

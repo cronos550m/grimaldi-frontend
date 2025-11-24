@@ -18,20 +18,24 @@ export default function Home() {
   const [contactOk, setContactOk] = useState(false);
   const [contactSending, setContactSending] = useState(false);
 
+// NUEVO: detectar si es mobile
+const [isMobile, setIsMobile] = useState(false);
+
+useEffect(() => {
+  const check = () => {
+    if (typeof window !== "undefined") {
+      setIsMobile(window.innerWidth < 768);
+    }
+  };
+  check();
+  window.addEventListener("resize", check);
+  return () => window.removeEventListener("resize", check);
+}, []);
+
+
+
   const [currentServiceSlide, setCurrentServiceSlide] = useState(0);
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-
-  // flag responsive
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const check = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   // Cargar servicios
   useEffect(() => {
@@ -58,17 +62,29 @@ export default function Home() {
   }, []);
 
   // HERO
-  const heroTitle =
-    texts.home?.title ||
-    (lang === "es"
-      ? "Conectamos tu carga con cualquier punto del país y del mundo"
-      : "We connect your cargo with any point in the country and the world");
+const heroTitle =
+texts.home?.title ||
+(lang === "es"
+  ? "Conectamos tu carga con cualquier punto del país y del mundo"
+  : "We connect your cargo with any point in the country and the world");
 
-  const heroDesc = texts.home?.desc || "";
+const heroDesc = texts.home?.desc || "";
 
-  // imagen por defecto del hero (está en public/)
-  const HERO_FALLBACK = "/grimaldi_left_bigger2_1920x1080_64c.png";
-  const heroImage = texts.home?.heroImage || HERO_FALLBACK;
+// imágenes por defecto del hero (desktop y mobile)
+const HERO_FALLBACK_DESKTOP = "/grimaldi_left_bigger2_1920x1080_64c.png";
+// si querés, podés usar otra imagen por defecto para mobile
+const HERO_FALLBACK_MOBILE = HERO_FALLBACK_DESKTOP;
+
+// vienen de LanguageContext (settings)
+const heroImageDesktop =
+texts.home?.heroImage || HERO_FALLBACK_DESKTOP;
+const heroImageMobile =
+texts.home?.heroImageMobile ||
+heroImageDesktop ||
+HERO_FALLBACK_MOBILE;
+
+// esta es la que realmente se usa en el JSX
+const heroImage = isMobile ? heroImageMobile : heroImageDesktop;
 
   // SERVICIOS
   const servicesTitle =
@@ -95,8 +111,8 @@ export default function Home() {
       ? "Somos una empresa de transporte y logística que brinda soluciones nacionales e internacionales para distintos sectores. Integramos transporte terrestre, marítimo y aéreo con almacenaje, distribución y gestión aduanera."
       : "We are a transport and logistics company providing national and international solutions for different sectors, integrating road, sea and air transport with warehousing, distribution and customs management.");
 
-  const ABOUT_FALLBACK_IMAGE = "/nosotros/nosotros_familia2_1920x1080.jpg";
-  const aboutImage = texts.about?.image || ABOUT_FALLBACK_IMAGE;
+      const ABOUT_FALLBACK_IMAGE = "/nosotros/nosotros_familia2_1920x1080.jpg";
+      const aboutImage = texts.about?.image || ABOUT_FALLBACK_IMAGE;
 
   // TESTIMONIOS
   const testimonialsTitle =
@@ -186,8 +202,9 @@ export default function Home() {
       ? "Mariano Castex 1140, Piso 4 Oficina 412, Canning, Buenos Aires"
       : "Mariano Castex 1140, 4th floor, office 412, Canning, Buenos Aires");
 
-  const DEFAULT_QR_IMAGE = "/QRSer.png";
-  const contactQrImage = contactConfig?.qrImage || DEFAULT_QR_IMAGE;
+      const DEFAULT_QR_IMAGE = "/QRSer.png";
+      const contactQrImage = contactConfig?.qrImage || DEFAULT_QR_IMAGE;
+    
 
   // CARRUSEL DE SERVICIOS
   const fallbackImages = [
@@ -399,16 +416,15 @@ export default function Home() {
           width: "100vw",
           marginLeft: "calc(50% - 50vw)",
           marginRight: "calc(50% - 50vw)",
-          minHeight: isMobile ? "75vh" : "calc(90vh - 80px)",
+          minHeight: "calc(90vh - 80px)",
           display: "flex",
           alignItems: "center",
           backgroundImage: heroImage
             ? `linear-gradient(120deg, rgba(15,23,42,0.55), rgba(15,23,42,0.2)), url(${heroImage})`
             : "linear-gradient(135deg, #020617, #0f172a)",
-          backgroundSize: isMobile ? "contain" : "cover",
-          backgroundPosition: isMobile ? "center top" : "center",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          backgroundColor: "#020617",
           padding: "40px 24px",
         }}
       >
@@ -620,17 +636,14 @@ export default function Home() {
                     <div
                       style={{
                         width: "100%",
-                        minHeight: isMobile ? 380 : 550,
+                        minHeight: 550,
                         backgroundImage: item.image
                           ? `url(${item.image})`
                           : "linear-gradient(135deg, #1d4ed8, #0f172a)",
-                        backgroundSize: isMobile ? "contain" : "cover",
-                        backgroundPosition: isMobile ? "center top" : "center",
-                        backgroundRepeat: "no-repeat",
-                        backgroundColor: "#020617",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
                         display: "flex",
                         alignItems: "flex-end",
-                        justifyContent: "center",
                       }}
                     >
                       <div
@@ -746,40 +759,42 @@ export default function Home() {
       </section>
 
       {/* NOSOTROS */}
-      <section id="nosotros" className="section-landing">
-        <div
-          className="section-inner"
-          style={{
-            display: "flex",
-            gap: 32,
-            alignItems: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 260 }}>
-            <h2 className="section-title" data-animate="left">
-              {aboutTitle}
-            </h2>
-            <p className="section-subtitle" data-animate="right">
-              {aboutDesc}
-            </p>
-          </div>
+      {/* NOSOTROS */}
+<section id="nosotros" className="section-landing">
+  <div
+    className="section-inner"
+    style={{
+      display: "flex",
+      gap: 32,
+      alignItems: "center",
+      flexWrap: "wrap",
+    }}
+  >
+    <div style={{ flex: 1, minWidth: 260 }}>
+      <h2 className="section-title" data-animate="left">
+        {aboutTitle}
+      </h2>
+      <p className="section-subtitle" data-animate="right">
+        {aboutDesc}
+      </p>
+    </div>
 
-          <div style={{ flex: 1, minWidth: 260 }}>
-            <img
-              src={aboutImage}
-              alt={lang === "es" ? "Equipo de logística" : "Logistics team"}
-              style={{
-                width: "100%",
-                display: "block",
-                borderRadius: 24,
-                objectFit: "cover",
-                boxShadow: "0 18px 50px rgba(15,23,42,0.18)",
-              }}
-            />
-          </div>
-        </div>
-      </section>
+    <div style={{ flex: 1, minWidth: 260 }}>
+      <img
+        src={aboutImage}
+        alt={lang === "es" ? "Equipo de logística" : "Logistics team"}
+        style={{
+          width: "100%",
+          display: "block",
+          borderRadius: 24,
+          objectFit: "cover",
+          boxShadow: "0 18px 50px rgba(15,23,42,0.18)",
+        }}
+      />
+    </div>
+  </div>
+</section>
+
 
       {/* TESTIMONIOS */}
       <section id="testimonios" className="section-landing">
