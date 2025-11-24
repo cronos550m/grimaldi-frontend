@@ -28,6 +28,11 @@ export default function Services() {
       .catch(() => setItems([]));
   }, []);
 
+  // ordenar y filtrar solo activos
+  const visibleItems = (items || [])
+    .filter((it) => it.active !== false)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+
   return (
     <div className="container">
       <h2>Servicios</h2>
@@ -38,16 +43,45 @@ export default function Services() {
           gap: 12,
         }}
       >
-        {items.map((it) => {
+        {visibleItems.map((it) => {
+          // títulos y descripciones desde múltiples posibles campos
+          const titleEs = it.title_es || (it.title && it.title.es) || "";
+          const titleEn = it.title_en || (it.title && it.title.en) || "";
+          const descEs =
+            it.desc_es || (it.description && it.description.es) || "";
+          const descEn =
+            it.desc_en || (it.description && it.description.en) || "";
+
+          const title = lang === "es"
+            ? titleEs || titleEn
+            : titleEn || titleEs;
+
+          const desc = lang === "es"
+            ? descEs || descEn
+            : descEn || descEs;
+
+          // misma lógica que en ServicesAdmin: fuentes para imagen
+          const baseImage =
+            it.image ||
+            it.image_url ||
+            it.url ||
+            it.path ||
+            (it.media && it.media.image);
+
+          const baseImageMobile =
+            it.image_mobile ||
+            it.imageMobile ||
+            baseImage;
+
           const imgSrc = isMobile
-            ? it.image_mobile || it.image || "/placeholder.png"
-            : it.image || it.image_mobile || "/placeholder.png";
+            ? baseImageMobile || baseImage || "/placeholder.png"
+            : baseImage || baseImageMobile || "/placeholder.png";
 
           return (
-            <div className="card" key={it._id || it.id}>
+            <div className="card" key={it._id || it.id || title + it.order}>
               <img
                 src={imgSrc}
-                alt={it.title?.[lang] || it.title?.es || "Servicio"}
+                alt={title || "Servicio"}
                 style={{
                   width: "100%",
                   height: isMobile ? 180 : 140,
@@ -55,8 +89,8 @@ export default function Services() {
                   borderRadius: 6,
                 }}
               />
-              <h3>{it.title?.[lang] || it.title?.es}</h3>
-              <p>{it.description?.[lang] || it.description?.es}</p>
+              <h3>{title || "Servicio"}</h3>
+              <p>{desc}</p>
             </div>
           );
         })}
