@@ -6,6 +6,7 @@ import SettingsAdmin from "./SettingsAdmin";
 import ContactsAdmin from "./ContactsAdmin";
 import UploadWidget from "./UploadWidget";
 import MessagesAdmin from "./MessagesAdmin";
+import AboutAdmin from "./AboutAdmin"; // NUEVO
 
 export default function AdminPanel({ token }) {
   const logout = () => {
@@ -59,8 +60,6 @@ export default function AdminPanel({ token }) {
               marginTop: 24,
             }}
           >
-
-
             <Link
               to="/admin/services"
               style={{
@@ -72,6 +71,20 @@ export default function AdminPanel({ token }) {
               }}
             >
               Servicios
+            </Link>
+
+            {/* NUEVO: botón Nosotros */}
+            <Link
+              to="/admin/about"
+              style={{
+                display: "block",
+                padding: "6px 10px",
+                borderRadius: 4,
+                textDecoration: "none",
+                color: "#fff",
+              }}
+            >
+              Nosotros
             </Link>
 
             <Link
@@ -126,9 +139,7 @@ export default function AdminPanel({ token }) {
               Mensajes contacto
             </Link>
 
-
-
-            {/* Botón de cerrar sesión SIEMPRE abajo de Uploads */}
+            {/* Botón de cerrar sesión */}
             <button
               type="button"
               onClick={logout}
@@ -161,14 +172,34 @@ export default function AdminPanel({ token }) {
               </div>
             }
           />
-          <Route path="services/*" element={<ServicesAdmin token={token} />} />
+
+          <Route
+            path="services/*"
+            element={<ServicesAdmin token={token} />}
+          />
+
+          {/* NUEVA RUTA: Nosotros */}
+          <Route
+            path="about/*"
+            element={<AboutAdmin token={token} />}
+          />
+
           <Route
             path="testimonios/*"
             element={<TestimoniosAdmin token={token} />}
           />
-          <Route path="settings" element={<SettingsAdmin token={token} />} />
-          <Route path="contacts" element={<ContactsAdmin token={token} />} />
-          <Route path="messages" element={<MessagesAdmin token={token} />} />
+          <Route
+            path="settings"
+            element={<SettingsAdmin token={token} />}
+          />
+          <Route
+            path="contacts"
+            element={<ContactsAdmin token={token} />}
+          />
+          <Route
+            path="messages"
+            element={<MessagesAdmin token={token} />}
+          />
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
       </main>
