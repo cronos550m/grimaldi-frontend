@@ -24,7 +24,10 @@ export default function Services() {
   useEffect(() => {
     api
       .get("/services")
-      .then((r) => setItems(r.data || []))
+      .then((r) => {
+        console.log("SERVICES FRONT", r.data);
+        setItems(r.data || []);
+      })
       .catch(() => setItems([]));
   }, []);
 
@@ -52,15 +55,12 @@ export default function Services() {
           const descEn =
             it.desc_en || (it.description && it.description.en) || "";
 
-          const title = lang === "es"
-            ? titleEs || titleEn
-            : titleEn || titleEs;
+          const title =
+            lang === "es" ? titleEs || titleEn : titleEn || titleEs;
 
-          const desc = lang === "es"
-            ? descEs || descEn
-            : descEn || descEs;
+          const desc = lang === "es" ? descEs || descEn : descEn || descEs;
 
-          // misma lógica que en ServicesAdmin: fuentes para imagen
+          // fuentes posibles de imagen
           const baseImage =
             it.image ||
             it.image_url ||
