@@ -4,9 +4,9 @@ import ServicesAdmin from "./ServicesAdmin";
 import TestimoniosAdmin from "./TestimoniosAdmin";
 import SettingsAdmin from "./SettingsAdmin";
 import ContactsAdmin from "./ContactsAdmin";
-import UploadWidget from "./UploadWidget";
 import MessagesAdmin from "./MessagesAdmin";
-import AboutAdmin from "./AboutAdmin"; // NUEVO
+import AboutAdmin from "./AboutAdmin";
+import ProfileAdmin from "./ProfileAdmin";
 
 export default function AdminPanel({ token }) {
   const logout = () => {
@@ -14,193 +14,149 @@ export default function AdminPanel({ token }) {
     window.location.href = "/admin";
   };
 
+  const linkStyle = (active) => ({
+    display: "block",
+    padding: "8px 10px",
+    borderRadius: 6,
+    marginBottom: 4,
+    textDecoration: "none",
+    fontSize: 14,
+    background: active ? "rgba(15,23,42,0.85)" : "transparent",
+    color: "white",
+    border: active ? "1px solid rgba(148,163,184,0.8)" : "none",
+  });
+
+  const [pathname, setPathname] = React.useState(window.location.pathname);
+
+  React.useEffect(() => {
+    const handler = () => setPathname(window.location.pathname);
+    window.addEventListener("popstate", handler);
+    return () => window.removeEventListener("popstate", handler);
+  }, []);
+
+  const isActive = (path) => pathname.startsWith(path);
+
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* SIDEBAR */}
       <aside
         style={{
-          width: 240,
-          background: "#0b3d91",
-          color: "#fff",
-          padding: 20,
+          width: 220,
+          background: "linear-gradient(180deg,#0b3d91,#1e293b)",
+          color: "white",
+          padding: 16,
           display: "flex",
           flexDirection: "column",
         }}
       >
-        <div>
-          {/* Logo + título Admin */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-            }}
+        <h2 style={{ fontSize: 18, marginBottom: 16 }}>Admin Grimaldi</h2>
+
+        <nav style={{ flex: 1 }}>
+          <Link
+            to="/admin/services"
+            style={linkStyle(isActive("/admin/services"))}
           >
-            <img
-              src="/logotransparente.png"
-              alt="Grimaldi Log"
-              style={{ height: 28, width: "auto" }}
-            />
-            <span
-              style={{
-                fontSize: 20,
-                fontWeight: 600,
-              }}
-            >
-              Admin
-            </span>
-          </div>
-
-          {/* Menú de navegación */}
-          <nav
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              marginTop: 24,
-            }}
+            Servicios
+          </Link>
+          <Link
+            to="/admin/flota"
+            style={linkStyle(isActive("/admin/flota"))}
           >
-            <Link
-              to="/admin/services"
-              style={{
-                display: "block",
-                padding: "6px 10px",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#fff",
-              }}
-            >
-              Servicios
-            </Link>
+            Flota
+          </Link>
+          <Link
+            to="/admin/testimonios"
+            style={linkStyle(isActive("/admin/testimonios"))}
+          >
+            Testimonios
+          </Link>
+          <Link
+            to="/admin/settings"
+            style={linkStyle(isActive("/admin/settings"))}
+          >
+            Settings
+          </Link>
+          <Link
+            to="/admin/about"
+            style={linkStyle(isActive("/admin/about"))}
+          >
+            Nosotros
+          </Link>
+          <Link
+            to="/admin/contacts"
+            style={linkStyle(isActive("/admin/contacts"))}
+          >
+            Contacto
+          </Link>
+          <Link
+            to="/admin/messages"
+            style={linkStyle(isActive("/admin/messages"))}
+          >
+            Mensajes contacto
+          </Link>
+          <Link
+            to="/admin/profile"
+            style={linkStyle(isActive("/admin/profile"))}
+          >
+            Perfil
+          </Link>
+        </nav>
 
-            {/* NUEVO: botón Nosotros */}
-            <Link
-              to="/admin/about"
-              style={{
-                display: "block",
-                padding: "6px 10px",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#fff",
-              }}
-            >
-              Nosotros
-            </Link>
-
-            <Link
-              to="/admin/testimonios"
-              style={{
-                display: "block",
-                padding: "6px 10px",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#fff",
-              }}
-            >
-              Testimonios
-            </Link>
-
-            <Link
-              to="/admin/settings"
-              style={{
-                display: "block",
-                padding: "6px 10px",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#fff",
-              }}
-            >
-              Settings
-            </Link>
-
-            <Link
-              to="/admin/contacts"
-              style={{
-                display: "block",
-                padding: "6px 10px",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#fff",
-              }}
-            >
-              Contacto empresa
-            </Link>
-
-            <Link
-              to="/admin/messages"
-              style={{
-                display: "block",
-                padding: "6px 10px",
-                borderRadius: 4,
-                textDecoration: "none",
-                color: "#fff",
-              }}
-            >
-              Mensajes contacto
-            </Link>
-
-            {/* Botón de cerrar sesión */}
-            <button
-              type="button"
-              onClick={logout}
-              style={{
-                marginTop: 16,
-                padding: "6px 10px",
-                borderRadius: 4,
-                border: "1px solid #fff",
-                background: "transparent",
-                color: "#fff",
-                cursor: "pointer",
-                textAlign: "left",
-              }}
-            >
-              Cerrar sesión
-            </button>
-          </nav>
-        </div>
+        <button
+          type="button"
+          onClick={logout}
+          style={{
+            marginTop: 16,
+            padding: "6px 10px",
+            borderRadius: 4,
+            border: "1px solid #fff",
+            background: "transparent",
+            color: "white",
+            cursor: "pointer",
+            fontSize: 13,
+          }}
+        >
+          Cerrar sesión
+        </button>
       </aside>
 
-      {/* CONTENIDO PRINCIPAL */}
       <main style={{ flex: 1, padding: 20 }}>
         <Routes>
           <Route
             path="/"
-            element={
-              <div>
-                <h1>Panel de administración</h1>
-                <p>Elegí una sección del menú de la izquierda.</p>
-              </div>
-            }
+            element={<Navigate to="/admin/services" replace />}
           />
-
           <Route
-            path="services/*"
+            path="/services"
             element={<ServicesAdmin token={token} />}
           />
-
-          {/* NUEVA RUTA: Nosotros */}
           <Route
-            path="about/*"
-            element={<AboutAdmin token={token} />}
-          />
-
-          <Route
-            path="testimonios/*"
+            path="/testimonios"
             element={<TestimoniosAdmin token={token} />}
           />
           <Route
-            path="settings"
+            path="/settings"
             element={<SettingsAdmin token={token} />}
           />
           <Route
-            path="contacts"
+            path="/about"
+            element={<AboutAdmin token={token} />}
+          />
+          <Route
+            path="/contacts"
             element={<ContactsAdmin token={token} />}
           />
           <Route
-            path="messages"
+            path="/messages"
             element={<MessagesAdmin token={token} />}
           />
-          <Route path="*" element={<Navigate to="/admin" replace />} />
+          <Route
+            path="/profile"
+            element={<ProfileAdmin token={token} />}
+          />
+          <Route
+            path="*"
+            element={<Navigate to="/admin/services" replace />}
+          />
         </Routes>
       </main>
     </div>
